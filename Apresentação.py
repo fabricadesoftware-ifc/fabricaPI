@@ -5,44 +5,6 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import numpy as np
 
-# import options.filters as filters
-# import options.configs as configs
-
-LOGGER = get_logger(__name__)
-
-# def apply_filters(df, translate_label):
-#     filters = {
-#         'status': f"NO_STATUS_MATRICULA == '{translate_label.get(st.session_state.selected_filter_status, '')}'", 
-#         'year': f"CO_CICLO_MATRICULA != '{translate_label.get(st.session_state.selected_filter_year, '')}'", 
-#         'curse': f"NO_STATUS_MATRICULA != '{translate_label.get(st.session_state.selected_filter_curse, '')}'"
-#     }
-
-#     query = ' and '.join(f'({condition})' for condition in filters.values())
-
-#     if query:
-#         df = df.query(query)
-
-#     return df
-
-# def runGraph(translate_label):
-#     if not st.session_state.get('uploaded_files'):
-#         st.write("Nenhum arquivo foi enviado")
-#         return
-
-#     files = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.uploaded_files]
-
-#     if not files:
-#         st.write("Nenhum dado encontrado nos arquivos.")
-#         return
-
-#     st.session_state.df = pd.concat(files, ignore_index=True)
-#     filtered_df = apply_filters(st.session_state.df, translate_label)
-
-#     if filtered_df.empty:
-#         st.write("Nenhum dado encontrado com os filtros aplicados.")
-#     else:
-#         st.write(filtered_df)
-
 def run():
     st.set_page_config(
         page_title="Campus PI App | Apresentação", 
@@ -64,46 +26,10 @@ def run():
 
             """
         }
-    )
-
-    if "is_running" not in st.session_state:
-        st.session_state.is_running = False       
+    )  
 
     with st.sidebar:
         pass
-        # st.write("# Opções:")
-    
-    #     st.session_state.selected_filter_status = st.selectbox(
-    #         label="Situação da Matrícula:",
-    #         options=filters.filter_options_status,
-    #     )
-       
-    #     st.session_state.selected_filter_year = st.selectbox(
-    #         label="Ciclos:",
-    #         options=filters.filter_options_year,
-    #     )
-        
-    #     st.session_state.selected_filter_curse = st.selectbox(
-    #         label="Cursos:",
-    #         options=filters.filter_options_curse,
-    #     )
-
-    #     st.session_state.uploaded_files = st.file_uploader("Escolha os Arquivos CSV", accept_multiple_files=True, help="Arraste e solte os arquivos aqui ou clique para fazer upload.")
-        
-    #     col1, col2 = st.columns(2)
-
-    #     with col1:
-    #         if st.button('Gerar Pesquisa', type="primary"):
-    #             st.session_state.is_running = True
-
-    #     with col2:
-    #          if st.button('Voltar ao Inicio', type="secondary"):
-    #             st.session_state.is_running = False
-
-
-    # if st.session_state.is_running:
-    #     runGraph(filters.translate_label)
-    # else:
     
     st.markdown(
         """
