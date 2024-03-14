@@ -32,6 +32,10 @@ def run():
 
     st.write("## 📃 Carregar Arquivos")
 
+
+    if "data_frames" not in st.session_state:
+        st.session_state.data_frames = []
+        
     if not st.session_state.get('uploaded_files'):
         st.session_state.uploaded_files = []
     
@@ -62,7 +66,8 @@ def run():
         for obj in st.session_state.uploaded_files:
             st.write(f"- {obj.name}")
 
-        st.session_state.data_frames = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.uploaded_files]
+        if len(st.session_state.data_frames) == 0:
+            st.session_state.data_frames = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.uploaded_files]
 
 if __name__ == "__main__":
     run()

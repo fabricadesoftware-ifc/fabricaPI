@@ -62,7 +62,7 @@ def data_frame_demo():
 
 
 st.set_page_config(page_title="DataFrame Demo", page_icon="✅")
-st.markdown("## ✅ Resultado dos DataFrames")
+st.markdown("## ✅ Dados Unificados")
 
 
 if __name__ == "__main__":

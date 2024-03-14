@@ -64,17 +64,22 @@ def run():
 
             """
         }
-    )
-
-    if "is_running" not in st.session_state:
-        st.session_state.is_running = False       
+    )  
 
     with st.sidebar:
         pass
 
+    st.write("## 📊 Gráficos")
+
+    if "data_frames" not in st.session_state:
+        st.session_state.data_frames = []
+
     def get_UN_data():
-        df = pd.concat(st.session_state.data_frames, ignore_index=True)
-        return df.set_index("NO_STATUS_MATRICULA")
+        if st.session_state.data_frames:
+            df = pd.concat(st.session_state.data_frames, ignore_index=True)
+            return df.set_index("NO_STATUS_MATRICULA")
+        else:
+            return pd.DataFrame()
 
     df = get_UN_data()
     df_alunos_abandono = df[df.index == 'ABANDONO'].shape[0]
@@ -103,7 +108,11 @@ def run():
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
-    st.pyplot(fig)
+    if st.session_state.data_frames != []:
+        st.pyplot(fig)
+    else:
+        st.write("( *Nenhum dado encontrado nos arquivos.* )")
+        st.page_link("pages/0_Carregar_Arquivos.py", label="Carregar Arquivos", icon="📃")
 
 if __name__ == "__main__":
     run()

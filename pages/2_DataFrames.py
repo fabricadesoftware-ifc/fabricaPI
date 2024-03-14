@@ -53,7 +53,10 @@ def run():
         st.session_state.data_frames = read_files(st.session_state.uploaded_files)
     
     st.write("## 🔢 DataFrames")
-    st.write(f"( *Foram gerados {len(st.session_state.uploaded_files)} dataFrames.* )")        
+    st.write(f"( *Foram gerados {len(st.session_state.uploaded_files)} dataFrames.* )")
+
+    if len(st.session_state.uploaded_files) == 0:
+        st.page_link("pages/0_Carregar_Arquivos.py", label="Carregar Arquivos", icon="📃")
    
     for index, obj in enumerate(st.session_state.data_frames):
         st.write(f"#### {st.session_state.uploaded_files[index].name.split('.')[0]}")
