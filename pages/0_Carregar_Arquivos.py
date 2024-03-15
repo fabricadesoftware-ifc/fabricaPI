@@ -32,7 +32,6 @@ def run():
 
     st.write("## 📃 Carregar Arquivos")
 
-
     if "data_frames" not in st.session_state:
         st.session_state.data_frames = []
         

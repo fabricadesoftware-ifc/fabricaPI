@@ -12,7 +12,7 @@ def data_frame_demo():
         df['CO_CICLO_MATRICULA'] = df['CO_CICLO_MATRICULA'].astype(str)
         return df
 
-    def getGraph(df):
+    def getGraph(df, title=''):
         df_alunos_abandono = df[df.index == 'ABANDONO'].shape[0]
         df_alunos_transf_ext = df[df.index == 'TRANSF_EXT'].shape[0]
         df_alunos_concluida = df[df.index == 'CONCLUÍDA'].shape[0]
@@ -26,7 +26,7 @@ def data_frame_demo():
 
         fig, ax = plt.subplots(figsize=(8, 4))
         ax.barh(df_NO_STATUS_MATRICULA["NO_STATUS_MATRICULA"], df_NO_STATUS_MATRICULA['Total'])
-        ax.set_title('')
+        ax.set_title(title)
         ax.set_xlabel('Quantidade de alunos')
         ax.set_ylabel('')
 

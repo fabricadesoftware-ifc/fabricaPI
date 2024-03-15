@@ -81,6 +81,7 @@ def run():
         else:
             return pd.DataFrame()
 
+    st.write("#### Quantidade de alunos por status de matricula")
     df = get_UN_data()
     df_alunos_abandono = df[df.index == 'ABANDONO'].shape[0]
     df_alunos_transf_ext = df[df.index == 'TRANSF_EXT'].shape[0]
@@ -103,8 +104,8 @@ def run():
         ax.text(v + 1, i, str(v), color="black", fontsize=8, ha="left", va="center")
 
 
-    ax.yaxis.set_tick_params(labelsize=12)
-    ax.xaxis.set_tick_params(labelsize=12)
+    ax.yaxis.set_tick_params(labelsize=10)
+    ax.xaxis.set_tick_params(labelsize=10)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
