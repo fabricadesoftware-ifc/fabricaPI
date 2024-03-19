@@ -1,9 +1,5 @@
 import streamlit as st
-from streamlit.logger import get_logger
 import pandas as pd
-import matplotlib.pyplot as plt
-import plotly.express as px
-import numpy as np
 
 def run():
     st.set_page_config(
@@ -65,7 +61,7 @@ def run():
         for obj in st.session_state.uploaded_files:
             st.write(f"- {obj.name}")
 
-        if len(st.session_state.data_frames) == 0:
+        if not st.session_state.data_frames:
             st.session_state.data_frames = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.uploaded_files]
 
 if __name__ == "__main__":

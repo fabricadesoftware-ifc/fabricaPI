@@ -15,7 +15,8 @@ def run():
             'Get Help': 'https://www.extremelycoolapp.com/help',
             'Report a bug': "https://www.extremelycoolapp.com/bug",
             'About': """
-                Este é um Projeto de Pesquisa desenvolvido para visualização, análise e transparência de dados do ifc araquari.
+                Este projeto de pesquisa tem como foco principal a análise dos indicadores de desempenho dos Institutos Federais. Através da coleta e análise de dados, pretendemos identificar áreas específicas que apresentam indicadores desfavoráveis, tais como taxa de evasão, desempenho acadêmico, satisfação dos alunos, entre outros.
+                  
                 \\
                 \\
                 Professor Responsavel: [Fábio Longo de Moura](www.github.com/ldmfabio) 
@@ -34,15 +35,19 @@ def run():
     st.markdown(
         """
         ## 📉 Projeto Campus PI  
-        \\
-        Projeto de pesquisa institucional do campus IFC Araquari com foco na visualização, análise e transparência de dados. Para utilziar basta fazer upload do arquivo .csv e começar a explorar os dados. Você pode filtrar, ordenar, visualizar e exportar os dados, além de gerar gráficos e relatórios.
-        ##
+        #####
+        ##### Descrição do Projeto:
+        Este projeto de pesquisa tem como foco principal a análise dos indicadores de desempenho dos Institutos Federais. Através da coleta e análise de dados, pretendemos identificar áreas específicas que apresentam indicadores desfavoráveis.
+        ##### Benefícios Esperados:
+        - Melhoria da tomada de decisão através de dados concretos e visualizações claras.
+        - Desenvolvimento de estratégias eficazes para melhorar os indicadores negativos.
+        - Contribuição para a melhoria contínua da qualidade do ensino nos Institutos Federais.
         """
     )
         
     st.write(
         """
-        **Um projeto desenvolvido por:**
+        ##### 
         \
         """
     )
@@ -53,7 +58,7 @@ def run():
 
     with col2:
         st.image('./assets/img/logo-fabrica.png')
-    st.write("*Versão 1.0.1 (beta)*")
+    st.write("*Versão 1.0.2 (beta)*")
 
 
 if __name__ == "__main__":
