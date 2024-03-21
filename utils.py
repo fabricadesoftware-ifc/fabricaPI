@@ -73,6 +73,15 @@ def read_files(files):
     return data_frames
  
 def clean_df(df):
+    if df.shape[0] > 1:
+        # Removes column if it has only null values or more than 50% null values
+        for column in df.columns:
+            if len(df[column].unique()) == 1 or df[column].isnull().sum() > len(df) * 0.5:
+                df = df.drop(column, axis=1)
+
+        # Removes rows if it has more than 50% null values
+        df = df.dropna(thresh=len(df.columns) * 0.5)
+
     return df
 
 def get_subindicators(df):
@@ -200,7 +209,16 @@ def get_filters(df):
     df_with_filters = df.query(f'{filter_cycle} and {filter_curse} and {filter_status} and {filter_municipality}')
     st.write(df_with_filters)
 
-
+def get_critical_cycles(df, df_status):
+    for i in df["CICLO DE MATRÍCULA"].unique():
+        if df_status.query(f'`NOME DO CICLO` == "{i}" and EM_CURSO < 2').shape[0] > 0:
+            st.write(f"#### Ciclo: {i.lower()}")
+            isShow = st.toggle('Mostrar somente os alunos em curso', True)
+            if isShow:
+                st.write(clean_df(df.query(f'`CICLO DE MATRÍCULA` == "{i}" and NO_STATUS_MATRICULA == "EM_CURSO"')))
+            else:
+                st.write(clean_df(df.query(f'`CICLO DE MATRÍCULA` == "{i}"')))
+            
 
 def get_tables(df):
     tab1, tab2, tab3 = st.tabs(["SITUAÇÃO DA MATRÍCULA POR CURSO", "TODOS OS DADOS COLETADOS", "CICLOS CRÍTICOS"])
@@ -212,6 +230,6 @@ def get_tables(df):
         get_filters(df)
     
     with tab3:
-        st.write(clean_df(df))
+        get_critical_cycles(df, get_table_status(df))
 
 
