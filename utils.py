@@ -18,24 +18,6 @@ def create_df_master():
     df['CO_CICLO_MATRICULA'] = df['CO_CICLO_MATRICULA'].astype(str)
     return df
 
-# def create_df_status(ciclo, df_master):
-#     new_df = []
-
-#     if ciclo:
-#         filter = f'CO_CICLO_MATRICULA == {ciclo}'
-#     else:
-#         filter = 'CO_CICLO_MATRICULA != "PINTO"'
-
-#     labels_status = df_master.query(f'{filter}')["NO_STATUS_MATRICULA"].unique()
-    
-#     for i in labels_status:
-#             count = df_master.query(f'{filter} & NO_STATUS_MATRICULA == "{i}"')["NO_STATUS_MATRICULA"].count()
-#             new_df.append({'Status da Matricula': i, 'Total': count})
-
-#     # retorna o dataframe e as labels de x e y
-#     return [pd.DataFrame(new_df), 'Total', 'Status da Matricula']
-
-
 def create_graph(df, y, x):
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.barh(df[y], df[x])
