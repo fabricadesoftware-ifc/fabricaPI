@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import get_tables, get_indicators, get_table_status, create_df_master, create_graph, create_df_status, create_df_merged, init_session_state, clean_df
+from utils import get_tables, get_indicators, get_subindicators, get_table_status, create_df_master, create_graph, create_df_status, create_df_merged, init_session_state, clean_df
 
 def main():
     st.set_page_config(
@@ -33,8 +33,13 @@ def main():
         st.error("Por favor, faça o upload de um arquivo.")
     else:
         st.session_state.master_data_frame = create_df_merged(temporary_df)
+        st.write("#")
+        
         get_indicators(st.session_state.master_data_frame)
+        st.divider()
+        get_subindicators(st.session_state.master_data_frame)
 
+        st.write("#")
         get_tables(st.session_state.master_data_frame)
 
 
