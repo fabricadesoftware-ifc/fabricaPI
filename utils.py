@@ -117,7 +117,7 @@ def get_indicators(df):
         df_status = get_table_status(df)
         number_of_critical_cycles =  df_status.query('EM_CURSO < 2').shape[0]
         st.write(f" ## {number_of_critical_cycles}")
-        st.caption("Ciclos Críticos")
+        st.caption("Total de Ciclos Críticos")
         
     with col3:
         number_of_cycles = df["CICLO DE MATRÍCULA"].nunique()
