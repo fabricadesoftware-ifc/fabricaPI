@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import get_tables, get_indicators, get_subindicators, get_table_status, create_df_master, create_graph, create_df_status, create_df_merged, init_session_state, clean_df
+from utils import get_tables, get_indicators, get_subindicators, create_df_master, create_df_merged, init_session_state
 
 def main():
     st.set_page_config(
@@ -20,7 +20,6 @@ def main():
                 Aluno Responsavel: [Mateus Lopes Albano](www.github.com/mateus-lopes)
                 \
                 \
-
             """
         }
     )  

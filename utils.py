@@ -73,14 +73,15 @@ def read_files(files):
     return data_frames
  
 def clean_df(df):
-    # # Removes column if it has only null values or more than 50% null values
-    # for column in df.columns:
-    #     if len(df[column].unique()) == 1 or df[column].isnull().sum() > len(df) * 0.5:
-    #         df = df.drop(column, axis=1)
+    if df.shape[0] > 1:
+        # Removes column if it has only null values or more than 50% null values
+        for column in df.columns:
+            if len(df[column].unique()) == 1 or df[column].isnull().sum() > len(df) * 0.5:
+                df = df.drop(column, axis=1)
 
-    # # Removes rows if it has more than 50% null values
-    # df = df.dropna(thresh=len(df.columns) * 0.5)
-    
+        # Removes rows if it has more than 50% null values
+        df = df.dropna(thresh=len(df.columns) * 0.5)
+
     return df
 
 def get_subindicators(df):
