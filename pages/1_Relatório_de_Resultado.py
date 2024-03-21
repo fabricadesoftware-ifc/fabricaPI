@@ -26,13 +26,15 @@ def main():
     )  
 
     init_session_state()
-    temporary_df = pd.read_csv('./assets/csv/example_ciclos.csv', encoding='latin-1', sep=';')
 
     st.markdown("## Relatório de Resultados")
     if not st.session_state.data_frames:
         st.error("Por favor, faça o upload de um arquivo.")
     else:
-        st.session_state.master_data_frame = create_df_merged(temporary_df)
+        temporary_df = pd.read_csv('./assets/csv/example_ciclos.csv', encoding='latin-1', sep=';')
+        df_master = create_df_master()
+        
+        st.session_state.master_data_frame = create_df_merged(temporary_df, df_master)
         st.write("#")
         
         get_indicators(st.session_state.master_data_frame)
