@@ -1,23 +1,5 @@
 import streamlit as st
-from streamlit.logger import get_logger
-import pandas as pd
-import matplotlib.pyplot as plt
-import plotly.express as px
-import numpy as np
-import os
-
-LOGGER = get_logger(__name__)
-
-def read_files(files):
-    if not files:
-        return []
-    data_frames = []
-    for file in files:
-        try:
-            data_frames.append(pd.read_csv(file, encoding='latin-1', sep=';'))
-        except Exception as e:
-            LOGGER.error(f"Error reading file {file.name}: {e}")
-    return data_frames
+from utils import read_files
 
 def run():
     st.set_page_config(
@@ -41,10 +23,7 @@ def run():
             """
         }
     )
-
-
-    with st.sidebar:
-        pass
+    st.write("## 🔢 DataFrames")
 
     if not st.session_state.get('uploaded_files'):
         st.session_state.uploaded_files = []
@@ -52,11 +31,11 @@ def run():
     if not st.session_state.get('data_frames'):
         st.session_state.data_frames = read_files(st.session_state.uploaded_files)
     
-    st.write("## 🔢 DataFrames")
-    st.write(f"( *Foram gerados {len(st.session_state.uploaded_files)} dataFrames.* )")
-
     if len(st.session_state.uploaded_files) == 0:
+        st.write("( *Nenhum dado encontrado nos arquivos.* )")
         st.page_link("pages/0_Carregar_Arquivos.py", label="Carregar Arquivos", icon="📃")
+    else:
+        st.write(f"( *Foram gerados {len(st.session_state.uploaded_files)} dataFrames.* )")
    
     for index, obj in enumerate(st.session_state.data_frames):
         st.write(f"#### {st.session_state.uploaded_files[index].name.split('.')[0]}")

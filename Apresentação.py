@@ -58,7 +58,7 @@ def run():
 
     with col2:
         st.image('./assets/img/logo-fabrica.png')
-    st.write("*Versão 1.0.2 (beta)*")
+    st.write("*Versão 1.0.3*")
 
 
 if __name__ == "__main__":

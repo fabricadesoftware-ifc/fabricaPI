@@ -1,0 +1,48 @@
+import streamlit as st
+import pandas as pd
+from utils import get_tables, get_indicators, get_subindicators, create_df_master, create_df_merged, init_session_state
+
+def main():
+    st.set_page_config(
+        page_title="Campus PI App | Resultado", 
+        page_icon="✅", 
+        layout="wide", 
+        initial_sidebar_state="expanded", 
+        menu_items={
+            'Get Help': 'https://www.extremelycoolapp.com/help',
+            'Report a bug': "https://www.extremelycoolapp.com/bug",
+            'About': """
+                Este é um Projeto de Pesquisa desenvolvido para visualização, análise e transparência de dados do ifc araquari.
+                \\
+                \\
+                Professor Responsavel: [Fábio Longo de Moura](www.github.com/ldmfabio) 
+                \\
+                Aluno Responsavel: [Mateus Lopes Albano](www.github.com/mateus-lopes)
+                \
+                \
+            """
+        }
+    )  
+
+    init_session_state()
+
+    st.markdown("## Relatório de Resultados")
+    if not st.session_state.data_frames:
+        st.error("Por favor, faça o upload de um arquivo.")
+    else:
+        temporary_df = pd.read_csv('./assets/csv/example_ciclos.csv', encoding='latin-1', sep=';')
+        df_master = create_df_master()
+        
+        st.session_state.master_data_frame = create_df_merged(temporary_df, df_master)
+        st.write("#")
+        
+        get_indicators(st.session_state.master_data_frame)
+        st.divider()
+        get_subindicators(st.session_state.master_data_frame)
+
+        st.write("#")
+        get_tables(st.session_state.master_data_frame)
+
+
+if __name__ == "__main__":
+    main()

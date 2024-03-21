@@ -2,46 +2,8 @@ import streamlit as st
 from streamlit.logger import get_logger
 import pandas as pd
 import matplotlib.pyplot as plt
-import plotly.express as px
-import numpy as np
-
-# import options.filters as filters
-# import options.configs as configs
 
 LOGGER = get_logger(__name__)
-
-# def apply_filters(df, translate_label):
-#     filters = {
-#         'status': f"NO_STATUS_MATRICULA == '{translate_label.get(st.session_state.selected_filter_status, '')}'", 
-#         'year': f"CO_CICLO_MATRICULA != '{translate_label.get(st.session_state.selected_filter_year, '')}'", 
-#         'curse': f"NO_STATUS_MATRICULA != '{translate_label.get(st.session_state.selected_filter_curse, '')}'"
-#     }
-
-#     query = ' and '.join(f'({condition})' for condition in filters.values())
-
-#     if query:
-#         df = df.query(query)
-
-#     return df
-
-# def runGraph(translate_label):
-#     if not st.session_state.get('uploaded_files'):
-#         st.write("Nenhum arquivo foi enviado")
-#         return
-
-#     files = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.uploaded_files]
-
-#     if not files:
-#         st.write("Nenhum dado encontrado nos arquivos.")
-#         return
-
-#     st.session_state.df = pd.concat(files, ignore_index=True)
-#     filtered_df = apply_filters(st.session_state.df, translate_label)
-
-#     if filtered_df.empty:
-#         st.write("Nenhum dado encontrado com os filtros aplicados.")
-#     else:
-#         st.write(filtered_df)
 
 def run():
     st.set_page_config(
@@ -65,10 +27,6 @@ def run():
             """
         }
     )  
-
-    with st.sidebar:
-        pass
-
     st.write("## 📊 Gráficos")
 
     if "data_frames" not in st.session_state:
@@ -81,7 +39,6 @@ def run():
         else:
             return pd.DataFrame()
 
-    st.write("#### Quantidade de alunos por status de matricula")
     df = get_UN_data()
     df_alunos_abandono = df[df.index == 'ABANDONO'].shape[0]
     df_alunos_transf_ext = df[df.index == 'TRANSF_EXT'].shape[0]
@@ -110,6 +67,7 @@ def run():
     ax.spines['right'].set_visible(False)
 
     if st.session_state.data_frames != []:
+        st.write("#### Quantidade de alunos por status de matricula")
         st.pyplot(fig)
     else:
         st.write("( *Nenhum dado encontrado nos arquivos.* )")
