@@ -33,7 +33,7 @@ def main():
         st.error("Por favor, faça o upload de um arquivo.")
     else:
         st.session_state.master_data_frame = create_df_merged(temporary_df)
-        # get_indicators(st.session_state.master_data_frame)
+        get_indicators(st.session_state.master_data_frame)
 
         get_tables(st.session_state.master_data_frame)
 
