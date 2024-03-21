@@ -1,7 +1,9 @@
-from urllib.error import URLError
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
+from streamlit.logger import get_logger
+
+LOGGER = get_logger(__name__)
 
 def init_session_state():
     if "data_frames" not in st.session_state:
@@ -16,22 +18,22 @@ def create_df_master():
     df['CO_CICLO_MATRICULA'] = df['CO_CICLO_MATRICULA'].astype(str)
     return df
 
-def create_df_status(ciclo, df_master):
-    new_df = []
+# def create_df_status(ciclo, df_master):
+#     new_df = []
 
-    if ciclo:
-        filter = f'CO_CICLO_MATRICULA == {ciclo}'
-    else:
-        filter = 'CO_CICLO_MATRICULA != "PINTO"'
+#     if ciclo:
+#         filter = f'CO_CICLO_MATRICULA == {ciclo}'
+#     else:
+#         filter = 'CO_CICLO_MATRICULA != "PINTO"'
 
-    labels_status = df_master.query(f'{filter}')["NO_STATUS_MATRICULA"].unique()
+#     labels_status = df_master.query(f'{filter}')["NO_STATUS_MATRICULA"].unique()
     
-    for i in labels_status:
-            count = df_master.query(f'{filter} & NO_STATUS_MATRICULA == "{i}"')["NO_STATUS_MATRICULA"].count()
-            new_df.append({'Status da Matricula': i, 'Total': count})
+#     for i in labels_status:
+#             count = df_master.query(f'{filter} & NO_STATUS_MATRICULA == "{i}"')["NO_STATUS_MATRICULA"].count()
+#             new_df.append({'Status da Matricula': i, 'Total': count})
 
-    # retorna o dataframe e as labels de x e y
-    return [pd.DataFrame(new_df), 'Total', 'Status da Matricula']
+#     # retorna o dataframe e as labels de x e y
+#     return [pd.DataFrame(new_df), 'Total', 'Status da Matricula']
 
 
 def create_graph(df, y, x):
@@ -50,3 +52,98 @@ def create_graph(df, y, x):
     ax.spines['right'].set_visible(False)
 
     st.pyplot(fig)
+
+def create_df_status(ciclo, df_master):
+    new_df = []
+
+    st.write(ciclo)
+
+    if ciclo != 0:
+        filter = f'CÓDIGO CICLO DE MATRÍCULA == {ciclo}'
+    else:
+        filter = 'CÓDIGO CICLO DE MATRÍCULA != "teste"'
+
+    labels_status = df_master.query(f'{filter}')["NO_STATUS_MATRICULA"].unique()
+    
+    for i in labels_status:
+        count = df_master.query(f'{filter} & NO_STATUS_MATRICULA == "{i}"')["NO_STATUS_MATRICULA"].count()
+        new_df.append({'Status da Matricula': i, 'Total': count})
+
+    # retorna o dataframe e as labels de x e y
+    return [pd.DataFrame(new_df), 'Total', 'Status da Matricula']
+
+def create_df_merged(temporary_df):
+    df_master = create_df_master()
+
+    temporary_df['CÓDIGO CICLO DE MATRÍCULA'] = temporary_df['CÓDIGO CICLO DE MATRÍCULA'].astype(str)
+    
+    df_merged = pd.merge(temporary_df, df_master, left_on='CÓDIGO CICLO DE MATRÍCULA', right_on='CO_CICLO_MATRICULA', how='inner')
+
+    return df_merged
+
+def read_files(files):
+    if not files:
+        return []
+    data_frames = []
+    for file in files:
+        try:
+            data_frames.append(pd.read_csv(file, encoding='latin-1', sep=';'))
+        except Exception as e:
+            LOGGER.error(f"Error reading file {file.name}: {e}")
+    return data_frames
+ 
+def clean_df(df):
+    return df
+
+def get_indicators(df):
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        number_of_students = df.shape[0]
+        st.write(f"## {number_of_students}")
+        st.caption("Total de Alunos")
+
+    with col2:
+        number_of_cycles = df["CICLO DE MATRÍCULA"].nunique()
+        st.write(f"## {number_of_cycles}")
+        st.caption("Total de Ciclos")
+
+    with col3:
+        number_of_curses = df["NOME DO CURSO"].nunique()
+        st.write(f"## {number_of_curses}")
+        st.caption("Total de Cursos")
+
+    with col4:
+        number_of_municipalities = df["MUNICIPIO"].nunique()
+        st.write(f"## {number_of_municipalities}")
+        st.caption("Total de Municípios")
+
+def get_table_status(df):
+    new_df = []
+
+    for i in df["CICLO DE MATRÍCULA"].unique():
+        new_df.append({
+            'NOME DO CICLO': i, 
+            'ABANDONO': df.query(f'`CICLO DE MATRÍCULA` == "{i}" and NO_STATUS_MATRICULA == "ABANDONO"').shape[0], 
+            'TRANSF_EXT': df.query(f'`CICLO DE MATRÍCULA` == "{i}" and NO_STATUS_MATRICULA == "TRANSF_EXT"').shape[0],
+            'CONCLUÍDA': df.query(f'`CICLO DE MATRÍCULA` == "{i}" and NO_STATUS_MATRICULA == "CONCLUÍDA"').shape[0], 
+            'DESLIGADO': df.query(f'`CICLO DE MATRÍCULA` == "{i}" and NO_STATUS_MATRICULA == "DESLIGADO"').shape[0],
+            'EM_CURSO': df.query(f'`CICLO DE MATRÍCULA` == "{i}" and NO_STATUS_MATRICULA == "EM_CURSO"').shape[0],
+            'TOTAL': df.query(f'`CICLO DE MATRÍCULA` == "{i}"').shape[0]
+        })
+    
+    new_df = pd.DataFrame(new_df)
+    return new_df
+
+def get_tables(df):
+    tab1, tab2 = st.tabs(["Todos os dados coletados", "Quantidade de Alunos por Status da Matrícula"])
+
+    with tab1:
+        # st.write("#### Todos os dados coletados")
+        st.write(clean_df(df))
+
+    with tab2:
+        # st.write("#### Quantidade de Alunos por Status da Matrícula")
+        st.write(get_table_status(df))
+
+

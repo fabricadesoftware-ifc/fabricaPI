@@ -81,7 +81,6 @@ def run():
         else:
             return pd.DataFrame()
 
-    st.write("#### Quantidade de alunos por status de matricula")
     df = get_UN_data()
     df_alunos_abandono = df[df.index == 'ABANDONO'].shape[0]
     df_alunos_transf_ext = df[df.index == 'TRANSF_EXT'].shape[0]
@@ -110,6 +109,7 @@ def run():
     ax.spines['right'].set_visible(False)
 
     if st.session_state.data_frames != []:
+        st.write("#### Quantidade de alunos por status de matricula")
         st.pyplot(fig)
     else:
         st.write("( *Nenhum dado encontrado nos arquivos.* )")
