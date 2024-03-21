@@ -95,8 +95,38 @@ def read_files(files):
 def clean_df(df):
     return df
 
+def get_subindicators(df):
+    col2, col3, col4, col5, col6 = st.columns(5)
+
+    with col2:
+        number_of_ongoing = df.query('NO_STATUS_MATRICULA == "EM_CURSO"').shape[0]
+        st.write(f" ### {number_of_ongoing}")
+        st.caption("Total em curso")
+    
+    with col3:
+        number_of_concluded = df.query('NO_STATUS_MATRICULA == "CONCLUÍDA"').shape[0]
+        st.write(f" ### {number_of_concluded}")
+        st.caption("Total de concluentes")
+    
+    with col4:
+        number_of_transfer = df.query('NO_STATUS_MATRICULA == "TRANSF_EXT"').shape[0]
+        st.write(f" ### {number_of_transfer}")
+        st.caption("Total de transferidos")
+    
+    with col5:
+        number_of_dropout = df.query('NO_STATUS_MATRICULA == "ABANDONO"').shape[0]
+        st.write(f" ### {number_of_dropout}")
+        st.caption("Total de desistentes")
+
+    with col6:
+        number_of_disconnected = df.query('NO_STATUS_MATRICULA == "DESLIGADO"').shape[0]
+        st.write(f" ### {number_of_disconnected}")
+        st.caption("Total de desligados")
+
+    return number_of_ongoing, number_of_concluded, number_of_dropout, number_of_transfer, number_of_disconnected
+
 def get_indicators(df):
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         number_of_students = df.shape[0]
@@ -104,19 +134,28 @@ def get_indicators(df):
         st.caption("Total de Alunos")
 
     with col2:
+        df_status = get_table_status(df)
+        number_of_critical_cycles =  df_status.query('EM_CURSO < 2').shape[0]
+        st.write(f" ## {number_of_critical_cycles}")
+        st.caption("Ciclos Críticos")
+        
+    with col3:
         number_of_cycles = df["CICLO DE MATRÍCULA"].nunique()
-        st.write(f"## {number_of_cycles}")
+        st.write(f"## {number_of_cycles}", color="primary")
         st.caption("Total de Ciclos")
 
-    with col3:
+    with col4:
         number_of_curses = df["NOME DO CURSO"].nunique()
         st.write(f"## {number_of_curses}")
         st.caption("Total de Cursos")
 
-    with col4:
+    with col5:
         number_of_municipalities = df["MUNICIPIO"].nunique()
         st.write(f"## {number_of_municipalities}")
         st.caption("Total de Municípios")
+
+    return number_of_students, number_of_cycles, number_of_curses, number_of_municipalities, number_of_critical_cycles
+
 
 def get_table_status(df):
     new_df = []
@@ -139,11 +178,9 @@ def get_tables(df):
     tab1, tab2 = st.tabs(["Todos os dados coletados", "Quantidade de Alunos por Status da Matrícula"])
 
     with tab1:
-        # st.write("#### Todos os dados coletados")
         st.write(clean_df(df))
 
     with tab2:
-        # st.write("#### Quantidade de Alunos por Status da Matrícula")
         st.write(get_table_status(df))
 
 
