@@ -211,10 +211,13 @@ def get_filters(df):
 def get_critical_cycles(df, df_status):
     for i in df["CICLO DE MATRÍCULA"].unique():
         if df_status.query(f'`NOME DO CICLO` == "{i}" and EM_CURSO < 2').shape[0] > 0:
-            st.write(f"## {i}")
-            st.write(clean_df(df.query(f'`CICLO DE MATRÍCULA` == "{i}"')))
-
-    
+            st.write(f"#### Ciclo: {i.lower()}")
+            isShow = st.toggle('Mostrar somente os alunos em curso', True)
+            if isShow:
+                st.write(clean_df(df.query(f'`CICLO DE MATRÍCULA` == "{i}" and NO_STATUS_MATRICULA == "EM_CURSO"')))
+            else:
+                st.write(clean_df(df.query(f'`CICLO DE MATRÍCULA` == "{i}"')))
+            
 
 def get_tables(df):
     tab1, tab2, tab3 = st.tabs(["SITUAÇÃO DA MATRÍCULA POR CURSO", "TODOS OS DADOS COLETADOS", "CICLOS CRÍTICOS"])
