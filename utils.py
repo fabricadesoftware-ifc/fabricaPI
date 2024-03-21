@@ -72,9 +72,7 @@ def create_df_status(ciclo, df_master):
     # retorna o dataframe e as labels de x e y
     return [pd.DataFrame(new_df), 'Total', 'Status da Matricula']
 
-def create_df_merged(temporary_df):
-    df_master = create_df_master()
-
+def create_df_merged(temporary_df, df_master):
     temporary_df['CÓDIGO CICLO DE MATRÍCULA'] = temporary_df['CÓDIGO CICLO DE MATRÍCULA'].astype(str)
     
     df_merged = pd.merge(temporary_df, df_master, left_on='CÓDIGO CICLO DE MATRÍCULA', right_on='CO_CICLO_MATRICULA', how='inner')
@@ -174,13 +172,64 @@ def get_table_status(df):
     new_df = pd.DataFrame(new_df)
     return new_df
 
+def get_filters(df):
+    col2, col3, col4, col5 = st.columns(4)
+    
+    with col2:
+        cycle_options = df["CICLO DE MATRÍCULA"].unique()
+        cycle_options = ['TODOS'] + cycle_options.tolist()
+        cycle = st.selectbox('Ciclo de Matrícula', cycle_options)
+        
+        if cycle == 'TODOS':
+            filter_cycle = '`CICLO DE MATRÍCULA` != "NT"'
+        else:
+            filter_cycle = f'`CICLO DE MATRÍCULA` == "{cycle}"'
+
+    with col3:
+        curse_options = df["NOME DO CURSO"].unique()
+        curse_options = ['TODOS'] + curse_options.tolist()
+        curse = st.selectbox('Curso', curse_options)
+
+        if curse == 'TODOS':
+            filter_curse = '`CICLO DE MATRÍCULA` != "NT"'
+        else:
+            filter_curse = f'`NOME DO CURSO` == "{curse}"'
+
+    with col4:
+        status_options = df["NO_STATUS_MATRICULA"].unique()
+        status_options = ['TODOS'] + status_options.tolist()
+        status = st.selectbox('Status da Matrícula', status_options)
+
+        if status == 'TODOS':
+            filter_status = '`CICLO DE MATRÍCULA` != "NT"'
+        else:
+            filter_status = f'`NO_STATUS_MATRICULA` == "{status}"'
+
+    with col5:
+        municipality_options = df["MUNICIPIO"].unique()
+        municipality_options = ['TODOS'] + municipality_options.tolist()
+        municipality = st.selectbox('Município', municipality_options)
+
+        if municipality == 'TODOS':
+            filter_municipality = '`CICLO DE MATRÍCULA` != "NT"'
+        else:
+            filter_municipality = f'`MUNICIPIO` == "{municipality}"'
+
+    df_with_filters = df.query(f'{filter_cycle} and {filter_curse} and {filter_status} and {filter_municipality}')
+    st.write(df_with_filters)
+
+
+
 def get_tables(df):
-    tab1, tab2 = st.tabs(["Todos os dados coletados", "Quantidade de Alunos por Status da Matrícula"])
+    tab1, tab2, tab3 = st.tabs(["SITUAÇÃO DA MATRÍCULA POR CURSO", "TODOS OS DADOS COLETADOS", "CICLOS CRÍTICOS"])
 
     with tab1:
-        st.write(clean_df(df))
+        st.write(get_table_status(df))
 
     with tab2:
-        st.write(get_table_status(df))
+        get_filters(df)
+    
+    with tab3:
+        st.write(clean_df(df))
 
 
