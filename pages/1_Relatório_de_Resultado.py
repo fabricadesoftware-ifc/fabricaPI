@@ -1,8 +1,8 @@
 import streamlit as st
-import pandas as pd
-from utils import get_tables, get_indicators, get_subindicators, create_df_master, create_df_merged, init_session_state
+from utils import *
 
 def main():
+    init_session_state()
     st.set_page_config(
         page_title="Campus PI App | Resultado", 
         page_icon="✅", 
@@ -24,25 +24,23 @@ def main():
         }
     )  
 
-    init_session_state()
+    st.markdown("## ✅ Relatório de Resultados")
 
-    st.markdown("## Relatório de Resultados")
-    if not st.session_state.data_frames:
-        st.error("Por favor, faça o upload de um arquivo.")
+    if not st.session_state.data_frames_students:
+        st.error("Por favor, faça o upload do arquivo de dados dos alunos.")
+    elif not st.session_state.data_frames_cycles:
+        st.error("Por favor, faça o upload do arquivo de dados dos ciclos.")
     else:
-        temporary_df = pd.read_csv('./assets/csv/example_ciclos.csv', encoding='latin-1', sep=';')
-        df_master = create_df_master()
+        df_cycles = create_df_cycles()
+        df_students = create_df_students()
+        st.session_state.master_data_frame = create_df_merged(df_cycles, df_students)
         
-        st.session_state.master_data_frame = create_df_merged(temporary_df, df_master)
         st.write("#")
-        
         get_indicators(st.session_state.master_data_frame)
         st.divider()
         get_subindicators(st.session_state.master_data_frame)
-
         st.write("#")
         get_tables(st.session_state.master_data_frame)
-
 
 if __name__ == "__main__":
     main()
