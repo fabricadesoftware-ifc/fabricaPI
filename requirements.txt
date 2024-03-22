@@ -2,10 +2,6 @@ numpy
 pandas
 pydeck
 streamlit
-<<<<<<< HEAD
 matplotlib
 plotly
 scikit-learn
-=======
-matplotlib
->>>>>>> 4b18800 (CONFIG: Add pdm [Refs: CONFIG: Add pdm #10])
