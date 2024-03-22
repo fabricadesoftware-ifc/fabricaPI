@@ -6,16 +6,22 @@ from streamlit.logger import get_logger
 LOGGER = get_logger(__name__)
 
 def init_session_state():
-    if "data_frames" not in st.session_state:
-        st.session_state.data_frames = None
-    if "data" not in st.session_state:
-        st.session_state.data = None
-    if "df" not in st.session_state:
-        st.session_state.df = None
+    if "data_frames_students" not in st.session_state:
+        st.session_state.data_frames_students = []
+    if "data_frames_cycles" not in st.session_state:
+        st.session_state.data_frames_cycles = []
+    if not st.session_state.get('uploaded_files_students'):
+        st.session_state.uploaded_files_students = []
+    if not st.session_state.get('uploaded_files_cycles'):
+        st.session_state.uploaded_files_cycles = []
 
-def create_df_master():
-    df = pd.concat(st.session_state.data_frames, ignore_index=True)
+def create_df_students():
+    df = pd.concat(st.session_state.data_frames_students, ignore_index=True)
     df['CO_CICLO_MATRICULA'] = df['CO_CICLO_MATRICULA'].astype(str)
+    return df
+
+def create_df_cycles():
+    df = pd.concat(st.session_state.data_frames_cycles, ignore_index=True)
     return df
 
 def create_graph(df, y, x):
@@ -35,7 +41,7 @@ def create_graph(df, y, x):
 
     st.pyplot(fig)
 
-def create_df_status(ciclo, df_master):
+def create_df_status(ciclo, df_students):
     new_df = []
 
     st.write(ciclo)
@@ -45,19 +51,19 @@ def create_df_status(ciclo, df_master):
     else:
         filter = 'CÓDIGO CICLO DE MATRÍCULA != "teste"'
 
-    labels_status = df_master.query(f'{filter}')["NO_STATUS_MATRICULA"].unique()
+    labels_status = df_students.query(f'{filter}')["NO_STATUS_MATRICULA"].unique()
     
     for i in labels_status:
-        count = df_master.query(f'{filter} & NO_STATUS_MATRICULA == "{i}"')["NO_STATUS_MATRICULA"].count()
+        count = df_students.query(f'{filter} & NO_STATUS_MATRICULA == "{i}"')["NO_STATUS_MATRICULA"].count()
         new_df.append({'Status da Matricula': i, 'Total': count})
 
     # retorna o dataframe e as labels de x e y
     return [pd.DataFrame(new_df), 'Total', 'Status da Matricula']
 
-def create_df_merged(temporary_df, df_master):
+def create_df_merged(temporary_df, df_students):
     temporary_df['CÓDIGO CICLO DE MATRÍCULA'] = temporary_df['CÓDIGO CICLO DE MATRÍCULA'].astype(str)
     
-    df_merged = pd.merge(temporary_df, df_master, left_on='CÓDIGO CICLO DE MATRÍCULA', right_on='CO_CICLO_MATRICULA', how='inner')
+    df_merged = pd.merge(temporary_df, df_students, left_on='CÓDIGO CICLO DE MATRÍCULA', right_on='CO_CICLO_MATRICULA', how='inner')
 
     return df_merged
 

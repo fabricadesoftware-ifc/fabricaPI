@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import create_df_master, create_graph, create_df_status, create_df_merged, init_session_state
+from utils import create_df_students, create_graph, create_df_status, create_df_merged, init_session_state
 
 def main():
     init_session_state()
@@ -8,10 +8,10 @@ def main():
 
     st.set_page_config(page_title="Resultado", page_icon="✅")
     st.markdown("## Relatório de Resultados")
-    if not st.session_state.data_frames:
+    if not st.session_state.data_frames_students or not st.session_state.data_frames_cycles:
         st.error("Por favor, faça o upload de um arquivo.")
     else:
-        df = create_df_master()
+        df = create_df_students()
         
         # Dados Tratados
         st.divider()
