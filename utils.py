@@ -167,6 +167,7 @@ def get_table_status(df):
         })
     
     new_df = pd.DataFrame(new_df)
+    
     return new_df
 
 def get_filters(df):
@@ -224,18 +225,43 @@ def get_critical_cycles(df, df_status):
                 st.write(clean_df(df.query(f'`CICLO DE MATRÍCULA` == "{i}" and NO_STATUS_MATRICULA == "EM_CURSO"')))
             else:
                 st.write(clean_df(df.query(f'`CICLO DE MATRÍCULA` == "{i}"')))
-            
 
 def get_tables(df):
     tab1, tab2, tab3 = st.tabs(["SITUAÇÃO DA MATRÍCULA POR CURSO", "TODOS OS DADOS COLETADOS", "CICLOS CRÍTICOS"])
 
     with tab1:
         st.write(get_table_status(df))
-
+        st.write("### Gráfico de Status da Matrícula por Ciclo")
+        generate_chart(st.session_state.master_data_frame)
+        
     with tab2:
         get_filters(df)
     
     with tab3:
         get_critical_cycles(df, get_table_status(df))
 
+def create_df_students_for_chart(df, ciclo, curse):
+    if ciclo in df['CICLO DE MATRÍCULA'].unique() and curse in df[df['CICLO DE MATRÍCULA'] == ciclo]['NOME DO CURSO'].unique():
+        # Filtra os dados com base nos valores selecionados
+        df_filtered = df[(df['CICLO DE MATRÍCULA'] == ciclo) & (df['NOME DO CURSO'] == curse)]
+        
+        # Conta os alunos por status de matrícula
+        status_counts = df_filtered['NO_STATUS_MATRICULA'].value_counts().reset_index()
+        
+        # Renomeia as colunas
+        status_counts.columns = ['Status da Matrícula', 'Total']
+        return status_counts
+    else:
+        return pd.DataFrame({'Status da Matrícula': [], 'Total': []})
 
+def generate_chart(df):
+    col1, col2 = st.columns(2)
+
+    with col1:
+        cycle = st.selectbox('Ciclo de Matrícula', df['CICLO DE MATRÍCULA'].unique())
+    with col2:
+        curse_options = df[df['CICLO DE MATRÍCULA'] == cycle]['NOME DO CURSO'].unique()
+        curse = st.selectbox('Nome do Curso', curse_options)
+
+    df_filtro_NO_STATUS_MATRICULA = create_df_students_for_chart(df, cycle, curse)
+    st.bar_chart(data=df_filtro_NO_STATUS_MATRICULA, y='Total', x='Status da Matrícula')   

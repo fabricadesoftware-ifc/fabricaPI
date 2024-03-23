@@ -41,6 +41,5 @@ def main():
         get_subindicators(st.session_state.master_data_frame)
         st.write("#")
         get_tables(st.session_state.master_data_frame)
-
 if __name__ == "__main__":
     main()
