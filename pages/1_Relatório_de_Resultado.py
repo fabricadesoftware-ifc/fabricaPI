@@ -4,7 +4,6 @@ from utils import *
 
 def main():
     df_manager = DataframeManager()
-    df_manager.init_session_state()
     st.set_page_config(
         page_title="Campus PI App | Resultado", 
         page_icon="✅", 
