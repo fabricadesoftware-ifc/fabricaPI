@@ -21,7 +21,6 @@ def run():
             """
         }
     )  
-
     st.markdown(
         """
         ## 📉 Projeto Campus PI  
@@ -41,11 +40,11 @@ def run():
 
     with col1:
         st.image('./assets/img/logo-ifc.png', width=300)
-
+        
     with col2:
         st.image('./assets/img/logo-fabrica.png')
 
-    st.write("*Versão 1.0.4*")
+    st.write("*Versão 1.1.0*")
 
 if __name__ == "__main__":
     run()

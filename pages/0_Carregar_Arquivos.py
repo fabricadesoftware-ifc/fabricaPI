@@ -30,9 +30,7 @@ def run():
 
     with tab1:
         error_file = False
-    
         files = st.file_uploader("Escolha os Arquivos CSV", accept_multiple_files=True, help="Arraste e solte os arquivos aqui ou clique para fazer upload.", key="file_uploader_students")
-
         col1, col2, col3, col4, col5, col6 = st.columns(6)
 
         with col1:
@@ -61,9 +59,7 @@ def run():
 
     with tab2:
         error_file = False
-    
         files = st.file_uploader("Escolha os Arquivos CSV", accept_multiple_files=True, help="Arraste e solte os arquivos aqui ou clique para fazer upload.", key="file_uploader_cycles")
-
         col1, col2, col3, col4, col5, col6 = st.columns(6)
 
         with col1:
@@ -88,11 +84,7 @@ def run():
                 st.write(f"- {obj.name}")
 
             if not st.session_state.data_frames_cycles:
-                st.session_state.data_frames_cycles = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.data_frames_cycles]
-    
-
-    
-    
+                st.session_state.data_frames_cycles = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.uploaded_files_cycles]
 
 if __name__ == "__main__":
     run()
