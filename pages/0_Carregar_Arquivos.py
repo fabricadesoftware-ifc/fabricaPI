@@ -1,9 +1,10 @@
 import streamlit as st
 import pandas as pd
-from utils import init_session_state
+from manager.dataframe_manager import DataframeManager
 
 def run():
-    init_session_state()
+    df_manager = DataframeManager()
+    df_manager.init_session_state()
     st.set_page_config(
         page_title="Campus PI App | Carregar Arquivos", 
         page_icon="📃", 

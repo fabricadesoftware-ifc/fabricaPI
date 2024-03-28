@@ -1,8 +1,10 @@
 import streamlit as st
+from manager.dataframe_manager import DataframeManager
 from utils import *
 
 def main():
-    init_session_state()
+    df_manager = DataframeManager()
+    df_manager.init_session_state()
     st.set_page_config(
         page_title="Campus PI App | Resultado", 
         page_icon="✅", 
