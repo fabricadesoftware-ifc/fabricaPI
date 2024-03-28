@@ -1,8 +1,8 @@
 import streamlit as st
-from utils import *
+from manager.dataframe_manager import DataframeManager
 
 def main():
-    init_session_state()
+    df_manager = DataframeManager()
     st.set_page_config(
         page_title="Campus PI App | Resultado", 
         page_icon="✅", 
@@ -23,24 +23,20 @@ def main():
             """
         }
     )  
-
     st.markdown("## ✅ Relatório de Resultados")
 
     if not st.session_state.data_frames_students:
-        st.error("Por favor, faça o upload do arquivo de dados dos alunos.")
+        st.error("Por favor, faça o upload dos arquivos corretamente.")
     elif not st.session_state.data_frames_cycles:
         st.error("Por favor, faça o upload do arquivo de dados dos ciclos.")
     else:
-        df_cycles = create_df_cycles()
-        df_students = create_df_students()
-        st.session_state.master_data_frame = create_df_merged(df_cycles, df_students)
-        
-        st.write("#")
-        get_indicators(st.session_state.master_data_frame)
+        df_cycles = df_manager.concact_data_sets(st.session_state.data_frames_cycles, cycles=True)
+        df_students = df_manager.concact_data_sets(st.session_state.data_frames_students, students=True)
+        st.session_state.master_data_frame = df_manager.get_master_dataframe(df_cycles, df_students)
+        df_manager.create_indicators(st.session_state.master_data_frame)
         st.divider()
-        get_subindicators(st.session_state.master_data_frame)
-        st.write("#")
-        get_tables(st.session_state.master_data_frame)
+        df_manager.create_subindicators(st.session_state.master_data_frame)
+        df_manager.create_tabs(st.session_state.master_data_frame)
 
 if __name__ == "__main__":
     main()
