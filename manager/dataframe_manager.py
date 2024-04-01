@@ -205,16 +205,4 @@ class DataframeManager:
                 if len(df[column].unique()) == 1 or df[column].isnull().sum() > len(df) * 0.5:
                     df = df.drop(column, axis=1)
         return df
-    
-    def create_tabs(self, df):
-        st.write("#")
-        tab1, tab2, tab3 = st.tabs(["SITUAÇÃO DA MATRÍCULA POR CURSO", "TODOS OS DADOS COLETADOS", "CICLOS CRÍTICOS"])
-
-        with tab1:
-            st.write(self.get_table_status(df))
-
-        with tab2:
-            self.create_report_table(df)
         
-        with tab3:
-            st.write(self.create_critical_table(df))

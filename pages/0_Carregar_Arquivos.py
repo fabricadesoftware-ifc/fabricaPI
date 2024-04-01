@@ -54,7 +54,7 @@ def run():
             for obj in st.session_state.uploaded_files_students:
                 st.write(f"- {obj.name}")
 
-            if not st.session_state.data_frames_students:
+            if st.session_state.data_frames_students is None or len(st.session_state.data_frames_students) == 0:
                 st.session_state.data_frames_students = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.uploaded_files_students]
 
     with tab2:
@@ -83,7 +83,7 @@ def run():
             for obj in st.session_state.uploaded_files_cycles:
                 st.write(f"- {obj.name}")
 
-            if not st.session_state.data_frames_cycles:
+            if st.session_state.data_frames_cycles is None or len(st.session_state.data_frames_cycles) == 0:
                 st.session_state.data_frames_cycles = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.uploaded_files_cycles]
 
 if __name__ == "__main__":
