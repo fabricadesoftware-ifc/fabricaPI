@@ -1,0 +1,23 @@
+[project]
+name = "fabricaPI"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "mateus-lopes", email = "mateusalbano22@gmail.com"},
+]
+dependencies = [
+    "numpy>=1.26.4",
+    "pandas>=2.2.2",
+    "pydeck>=0.9.0",
+    "streamlit>=1.33.0",
+    "matplotlib>=3.8.4",
+    "plotly>=5.22.0",
+    "scikit-learn>=1.4.2",
+]
+requires-python = "==3.10.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
