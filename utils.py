@@ -136,7 +136,7 @@ def get_indicators(df):
         
     with col3:
         number_of_cycles = df["CICLO DE MATRÍCULA"].nunique()
-        st.write(f"## {number_of_cycles}", color="primary")
+        st.write(f"## {number_of_cycles}")
         st.caption("Total de Ciclos")
 
     with col4:
