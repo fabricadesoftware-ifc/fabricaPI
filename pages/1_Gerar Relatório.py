@@ -1,6 +1,4 @@
 import streamlit as st
-from streamlit.logger import get_logger
-import pandas as pd
 from manager.dataframe_manager import DataframeManager
 from manager.chart_manager import ChartManager
 from streamlit_echarts import st_echarts
@@ -17,22 +15,16 @@ def run():
             'Get Help': 'https://www.extremelycoolapp.com/help',
             'Report a bug': "https://www.extremelycoolapp.com/bug",
             'About': """
-                Este projeto de pesquisa tem como foco principal a análise dos indicadores de desempenho dos Institutos Federais. Através da coleta e análise de dados, pretendemos identificar áreas específicas que apresentam indicadores desfavoráveis, tais como taxa de evasão, desempenho acadêmico, satisfação dos alunos, entre outros.
-                  
-                \\
-                \\
-                Professor Responsavel: [Fábio Longo de Moura](www.github.com/ldmfabio) 
-                \\
-                Aluno Responsavel: [Mateus Lopes Albano](www.github.com/mateus-lopes)
-                \
-                \
-
+                Este projeto de pesquisa tem como foco principal a análise dos indicadores de desempenho dos Institutos Federais. Através da coleta e análise de dados, pretendemos identificar áreas específicas que apresentam indicadores desfavorávei e buscar ciclos críticos.
+                ###### Professor Responsavel: [Fábio Longo de Moura](www.github.com/ldmfabio)
+                ###### Aluno Responsavel: [Mateus Lopes Albano](www.github.com/mateus-lopes)
+                ##
             """
         }
     )
     
-
     st.title("Relatório de Resultados")
+   
     if "data_frames_cycles" not in st.session_state or len(st.session_state.data_frames_cycles) == 0 or "data_frames_students" not in st.session_state or len(st.session_state.data_frames_students) == 0:
         st.error("🚩 Por favor, faça o upload dos arquivos de estudantes e ciclos.")
         st.info('🔎 Se você já carrgou algum arquivo verifique se possui a formatação correta.')
@@ -41,9 +33,7 @@ def run():
         df_manager.create_indicators(df_master)
         st.divider()
         df_manager.create_subindicators(df_master)
-
         st.write("##")
-
         tab1, tab2, tab3 = st.tabs([
             "SITUAÇÃO DA MATRÍCULA POR CURSO", 
             "TODOS OS DADOS COLETADOS", 
@@ -52,7 +42,6 @@ def run():
 
         with tab1:
             st.caption("### Tabela de Status da Matrícula por Ciclo")
-            
             table_status_formatted = df_manager.get_table_status(df_master)
             height, bars_mt, pie_mt = df_manager.calculate_layout_params(table_status_formatted)
             options = {
@@ -109,15 +98,17 @@ def run():
 
             st.table(table_status_formatted)
             st_echarts(options=options, height=f"{height}px")
+
         with tab2:
             df_manager.create_report_table(df_master)
+
         with tab3:
-            st.info("🔎 Os ciclo críticos são identificados quando possuem menos de 3 alunos ativos.")
             critical_table = df_manager.create_critical_table(df_master)
-            if not critical_table.empty:
+            if critical_table is not None and not critical_table.empty:
+                st.info("🔎 Os ciclo críticos são identificados quando possuem menos de 3 alunos ativos.")
                 st.write(critical_table)
             else:
-                st.success("Nenhum ciclo crítico encontrado.")
+                st.success("✅ Nenhum ciclo crítico encontrado.")
 
 if __name__ == "__main__":
     run()

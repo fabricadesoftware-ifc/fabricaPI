@@ -13,15 +13,10 @@ def run():
             'Get Help': 'https://www.extremelycoolapp.com/help',
             'Report a bug': "https://www.extremelycoolapp.com/bug",
             'About': """
-                Este é um Projeto de Pesquisa desenvolvido para visualização, análise e transparência de dados do ifc araquari.
-                \\
-                \\
-                Professor Responsavel: [Fábio Longo de Moura](www.github.com/ldmfabio) 
-                \\
-                Aluno Responsavel: [Mateus Lopes Albano](www.github.com/mateus-lopes)
-                \
-                \
-
+                Este projeto de pesquisa tem como foco principal a análise dos indicadores de desempenho dos Institutos Federais. Através da coleta e análise de dados, pretendemos identificar áreas específicas que apresentam indicadores desfavorávei e buscar ciclos críticos.
+                ###### Professor Responsavel: [Fábio Longo de Moura](www.github.com/ldmfabio)
+                ###### Aluno Responsavel: [Mateus Lopes Albano](www.github.com/mateus-lopes)
+                ##
             """
         }
     )
