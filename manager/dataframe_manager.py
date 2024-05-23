@@ -203,9 +203,30 @@ class DataframeManager:
     
     def clean_df(self, df):
         if df.shape[0] > 1:
-            # Removes column if it has only null values or more than 75% null values
             for column in df.columns:
                 if len(df[column].unique()) == 1 or df[column].isnull().sum() > len(df) * 0.5:
                     df = df.drop(column, axis=1)
         return df
+    
+    def calculate_layout_params(self, table_status):
+        num_rows = len(table_status.index)
+
+        if num_rows <= 10:
+            height = 900
+            bars_mt = "32%"
+            pie_mt = "18%"
+        elif num_rows <= 20:
+            height = 100 * num_rows
+            bars_mt = "15%"
+            pie_mt = "8%"
+        elif num_rows <= 30:
+            height = 100 * num_rows
+            bars_mt = "12%"
+            pie_mt = "6%"
+        else:
+            height = 100 * num_rows
+            bars_mt = "6.5%"
+            pie_mt = "3.5%"
+        
+        return height, bars_mt, pie_mt
         
