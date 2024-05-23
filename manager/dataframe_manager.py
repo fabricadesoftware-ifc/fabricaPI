@@ -35,8 +35,9 @@ class DataframeManager:
         table_status.columns = ['ABANDONO', 'CONCLUÍDA', 'DESLIGADO', 'EM_CURSO', 'TRANSF_EXT', 'TOTAL DE ALUNOS']
         table_status = table_status.reset_index()
         table_status.rename(columns={'CICLO DE MATRÍCULA': 'NOME DO CICLO'}, inplace=True)
+        table_status_formatted = table_status.set_index('NOME DO CICLO')
         
-        return table_status
+        return table_status_formatted
 
     def create_indicators(self, df):
         indicators = [
@@ -160,7 +161,7 @@ class DataframeManager:
 
     def create_critical_table(self, df):
         for i in df["CICLO DE MATRÍCULA"].unique():
-            if self.get_table_status(df).query(f'`NOME DO CICLO` == "{i}" and EM_CURSO < 2').shape[0] > 0:
+            if self.get_table_status(df).query(f'`NOME DO CICLO` == "{i}" and EM_CURSO < 3').shape[0] > 0:
                 st.write(f"#### Ciclo: {i.lower()}")
                 isShow = st.toggle('Mostrar somente os alunos em curso', True)
                 if isShow:
@@ -168,24 +169,26 @@ class DataframeManager:
                 else:
                     return df.query(f'`CICLO DE MATRÍCULA` == "{i}"')
 
-    def concact_data_sets(self, data_frames, students=False, cycles=False):
+    def get_master_dataframe(self):
+        df_cycles =  self.concact_data_sets(st.session_state.data_frames_cycles, students=False)
+        df_students =  self.concact_data_sets(st.session_state.data_frames_students, students=True)
+        return pd.merge(df_cycles, df_students, left_on='CÓDIGO CICLO DE MATRÍCULA', right_on='CO_CICLO_MATRICULA', how='inner')
+
+    def concact_data_sets(self, data_frames, students=False):
         if students:
             for i in range(len(data_frames)):
                 if 'CO_CICLO_MATRICULA' in data_frames[i].columns:
                     data_frames[i]['CO_CICLO_MATRICULA'] = data_frames[i]['CO_CICLO_MATRICULA'].astype(str)
-        if cycles:
+        else:
             for i in range(len(data_frames)):
                 if 'CÓDIGO CICLO DE MATRÍCULA' in data_frames[i].columns:
                     data_frames[i]['CÓDIGO CICLO DE MATRÍCULA'] = data_frames[i]['CÓDIGO CICLO DE MATRÍCULA'].astype(str)
         return pd.concat(data_frames, ignore_index=True)
 
-    def get_master_dataframe(self, df_cycles, df_students):
-        return pd.merge(df_cycles, df_students, left_on='CÓDIGO CICLO DE MATRÍCULA', right_on='CO_CICLO_MATRICULA', how='inner')
-
     def verify_files(self, files, one_file=False):
         st.session_state.error_file_message = ''
         if not files:
-            st.session_state.error_file_message = "Por favor, selecione algum arquivo."
+            st.session_state.error_file_message = "Você não selecionou nenhum arquivo CSV."
             return False
         
         for i, x in enumerate(files):
@@ -194,7 +197,7 @@ class DataframeManager:
                 return False
         
         if not len(files) == 1 and one_file:
-            st.session_state.error_file_message = "Por favor, selecione apenas um arquivo."
+            st.session_state.error_file_message = "Você deve selecionar apenas um arquivo CSV."
             return False
         return True
     
