@@ -29,9 +29,9 @@ def main():
     st.markdown("## ✅ Relatório de Resultados")
 
     if not st.session_state.data_frames_students or len(st.session_state.data_frames_students) == 0:
-        st.error("Por favor, faça o upload dos arquivos de estudantes.")
+        st.error("🚩 Por favor, faça o upload dos arquivos de estudantes.")
     elif not st.session_state.data_frames_cycles or len(st.session_state.data_frames_cycles) == 0:
-        st.error("Por favor, faça o upload do arquivo de dados dos ciclos.")
+        st.error("🚩 Por favor, faça o upload do arquivo de dados dos ciclos.")
     else:
         st.session_state.data_frame_cycles = df_manager.concact_data_sets(st.session_state.data_frames_cycles, cycles=True)
         st.session_state.data_frame_students = df_manager.concact_data_sets(st.session_state.data_frames_students, students=True)

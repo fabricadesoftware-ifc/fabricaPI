@@ -9,7 +9,7 @@ def main():
     st.set_page_config(page_title="Resultado", page_icon="✅")
     st.markdown("## Relatório de Resultados")
     if not st.session_state.data_frames_students or not st.session_state.data_frames_cycles:
-        st.error("Por favor, faça o upload de um arquivo.")
+        st.error("🚩 Por favor, faça o upload de um arquivo.")
     else:
         df = create_df_students()
         
