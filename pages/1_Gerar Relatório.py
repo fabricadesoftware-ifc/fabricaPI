@@ -103,9 +103,9 @@ def run():
             df_manager.create_report_table(df_master)
 
         with tab3:
+            st.info("🔎 Os ciclo críticos são identificados quando possuem menos de 3 alunos ativos.")
             critical_table = df_manager.create_critical_table(df_master)
             if critical_table is not None and not critical_table.empty:
-                st.info("🔎 Os ciclo críticos são identificados quando possuem menos de 3 alunos ativos.")
                 st.write(critical_table)
             else:
                 st.success("✅ Nenhum ciclo crítico encontrado.")

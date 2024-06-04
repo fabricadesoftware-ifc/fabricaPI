@@ -4,5 +4,8 @@
   ],
   "python.autoComplete.extraPaths": [
     "${workspaceFolder}/__pypackages__/3.10/lib"
+  ],
+  "conventionalCommits.scopes": [
+    "new-version"
   ]
 }
