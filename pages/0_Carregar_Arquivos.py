@@ -21,6 +21,7 @@ def run():
         }
     )
     st.title("Carregar Arquivos")
+    
     tab1, tab2 = st.tabs(["SISTEC ALUNOS", "SISTEC CICLOS"])
     
     with tab1:

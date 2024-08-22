@@ -97,7 +97,7 @@ def run():
             options["series"].append(series_pie)
 
             st.table(table_status_formatted)
-            st_echarts(options=options, height=f"{height}px")
+            # st_echarts(options=options, height=f"{height}px")
 
         with tab2:
             df_manager.create_report_table(df_master)

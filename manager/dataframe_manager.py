@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 from streamlit.logger import get_logger
+from manager.config import TABLE_STATUS_COLUMNS   
 
 LOGGER = get_logger(__name__)
 
@@ -29,12 +30,44 @@ class DataframeManager:
         if name in st.session_state:
             return st.session_state[name].keys()
 
+    def get_locked_students(self, cycle):
+        csv = pd.read_csv('./assets/csv/example_trancados.csv', encoding='latin-1', sep=';')
+        master = self.get_master_dataframe()
+
+        st.write(csv)
+        st.write(master)
+
+        table_status = master.groupby(['CICLO DE MATRÍCULA', 'NO_STATUS_MATRICULA']).size().unstack(fill_value=0)
+        table_status['TOTAL DE ALUNOS'] = table_status.sum(axis=1)
+        st.write(table_status)
+
+        df_merged = pd.merge(csv, master, on='CICLO DE MATRÍCULA', how='left')
+        df_merged['NO_STATUS_MATRICULA'] = df_merged['NO_STATUS_MATRICULA_y'].combine_first(df_merged['NO_STATUS_MATRICULA_x'])
+
+        st.write('df_merged', df_merged)
+
+        df_trancados = df_merged[df_merged['NO_STATUS_MATRICULA'] == 'TRANCADO']
+
+        st.write('df_trancados', df_trancados)
+        df_resultado = df_trancados.groupby('CICLO DE MATRÍCULA').size().reset_index(name='Quantidade_Trancados')
+
+        print('DF RESULTADO', df_resultado)
+
     def get_table_status(self, df):
+        self.get_locked_students('QUÍMICA - EDUCAÇÃO PRESENCIAL - MAR. 2022 / DEZ. 2025')
         table_status = df.groupby(['CICLO DE MATRÍCULA', 'NO_STATUS_MATRICULA']).size().unstack(fill_value=0)
         table_status['TOTAL DE ALUNOS'] = table_status.sum(axis=1)
-        table_status.columns = ['ABANDONO', 'CONCLUÍDA', 'DESLIGADO', 'EM_CURSO', 'TRANSF_EXT', 'TOTAL DE ALUNOS']
+        st.write(pd.read_csv('./assets/csv/example_trancados.csv', encoding='latin-1', sep=';'))
+
+        status_columns = TABLE_STATUS_COLUMNS
+        missing_columns = set(status_columns) - set(table_status.columns)
+        for column in missing_columns:
+            table_status[column] = 0
+
+        table_status = table_status[status_columns]
         table_status = table_status.reset_index()
         table_status.rename(columns={'CICLO DE MATRÍCULA': 'NOME DO CICLO'}, inplace=True)
+
         table_status_formatted = table_status.set_index('NOME DO CICLO')
         
         return table_status_formatted
