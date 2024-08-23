@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
+import re
 from streamlit.logger import get_logger
 from manager.config import TABLE_STATUS_COLUMNS   
 
@@ -30,45 +31,62 @@ class DataframeManager:
         if name in st.session_state:
             return st.session_state[name].keys()
 
-    def get_locked_students(self, cycle):
+    def extract_year(self, ciclo_str):
+        match = re.search(r'\b\d{4}\b', ciclo_str)
+        return match.group(0) if match else None
+
+    def get_locked_students(self):
         csv = pd.read_csv('./assets/csv/example_trancados.csv', encoding='latin-1', sep=';')
         master = self.get_master_dataframe()
 
-        st.write(csv)
-        st.write(master)
+        # Extrair os quatro primeiros dígitos da matrícula (assumindo que a coluna se chama 'Matricula')
+        csv['Ciclo_Extraido'] = csv['matricula'].astype(str).str[:4]
+        master['CICLO DE MATRÍCULA'] = master['CICLO DE MATRÍCULA'].apply(self.extract_year)
 
-        table_status = master.groupby(['CICLO DE MATRÍCULA', 'NO_STATUS_MATRICULA']).size().unstack(fill_value=0)
-        table_status['TOTAL DE ALUNOS'] = table_status.sum(axis=1)
-        st.write(table_status)
+        # Verifique se os valores extraídos são únicos
+        master_unique = master.drop_duplicates(subset=['CICLO DE MATRÍCULA'])
 
-        df_merged = pd.merge(csv, master, on='CICLO DE MATRÍCULA', how='left')
-        df_merged['NO_STATUS_MATRICULA'] = df_merged['NO_STATUS_MATRICULA_y'].combine_first(df_merged['NO_STATUS_MATRICULA_x'])
+        # Combinar os DataFrames com base na comparação dos anos extraídos
+        combined_df = pd.merge(csv, master_unique, left_on='Ciclo_Extraido', right_on='CICLO DE MATRÍCULA', how='inner')
 
-        st.write('df_merged', df_merged)
+        # Mostrar os DataFrames
+        ciclo_counts = combined_df['Ciclo_Extraido'].value_counts()
 
-        df_trancados = df_merged[df_merged['NO_STATUS_MATRICULA'] == 'TRANCADO']
+        st.write('csv', csv)
+        st.write('master', master)
+        st.write('combined_df', combined_df)
+        st.write('ciclo_counts', ciclo_counts)
 
-        st.write('df_trancados', df_trancados)
-        df_resultado = df_trancados.groupby('CICLO DE MATRÍCULA').size().reset_index(name='Quantidade_Trancados')
-
-        print('DF RESULTADO', df_resultado)
+        return ciclo_counts
 
     def get_table_status(self, df):
-        self.get_locked_students('QUÍMICA - EDUCAÇÃO PRESENCIAL - MAR. 2022 / DEZ. 2025')
+        ciclo_counts = self.get_locked_students()
+
         table_status = df.groupby(['CICLO DE MATRÍCULA', 'NO_STATUS_MATRICULA']).size().unstack(fill_value=0)
         table_status['TOTAL DE ALUNOS'] = table_status.sum(axis=1)
-        st.write(pd.read_csv('./assets/csv/example_trancados.csv', encoding='latin-1', sep=';'))
 
         status_columns = TABLE_STATUS_COLUMNS
         missing_columns = set(status_columns) - set(table_status.columns)
         for column in missing_columns:
             table_status[column] = 0
 
-        table_status = table_status[status_columns]
-        table_status = table_status.reset_index()
-        table_status.rename(columns={'CICLO DE MATRÍCULA': 'NOME DO CICLO'}, inplace=True)
+        table_status['ANO'] = table_status.index.to_series().apply(self.extract_year)
 
-        table_status_formatted = table_status.set_index('NOME DO CICLO')
+        df_presentation = table_status[status_columns]
+
+        for ciclo, count in ciclo_counts.items():
+            st.write(f"Ciclo: {ciclo}, Contagem: {count}")
+            table_status.loc[table_status['ANO'] == ciclo, 'TRANCADO'] = count
+
+        df_presentation['TRANCADO'] = table_status['TRANCADO']
+        df_presentation['FREQUENTANDO'] = abs(table_status['EM_CURSO'] - table_status['TRANCADO'])
+
+        st.write(table_status)
+        st.write(df_presentation)
+        df_presentation = df_presentation.reset_index()
+        df_presentation.rename(columns={'CICLO DE MATRÍCULA': 'NOME DO CICLO'}, inplace=True)
+
+        table_status_formatted = df_presentation.set_index('NOME DO CICLO')
         
         return table_status_formatted
 
