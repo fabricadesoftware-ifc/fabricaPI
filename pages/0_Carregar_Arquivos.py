@@ -22,7 +22,7 @@ def run():
     )
     st.title("Carregar Arquivos")
     
-    tab1, tab2 = st.tabs(["SISTEC ALUNOS", "SISTEC CICLOS"])
+    tab1, tab2, tab3 = st.tabs(["SISTEC ALUNOS", "SISTEC CICLOS", "TRANCADOS (OPICIONAL)"])
     
     with tab1:
         error_file = False
@@ -81,6 +81,34 @@ def run():
             for obj in st.session_state.uploaded_files_cycles:
                 st.write(f"- {obj.name}")
 
+    with tab3:
+        error_file = False
+        files = st.file_uploader("Escolha os Arquivos CSV", accept_multiple_files=True, help="Arraste e solte os arquivos aqui ou clique para fazer upload.", key="file_uploader_tranc")
+        col1, col2 = st.columns((2, 10))
+
+        with col1:
+            if st.button('Carregar arquivos', type="secondary", key="load_files_tranc"):
+                if df_manager.verify_files(files):
+                    st.session_state.uploaded_files_tranc = files
+                    st.session_state.data_frames_tranc = [pd.read_csv(i, encoding='latin-1', sep=';') for i in st.session_state.uploaded_files_tranc]
+
+                else:
+                    error_file = True
+
+        with col2:
+            if st.session_state.uploaded_files_tranc:
+                if st.button('Limpar Escolha', type="secondary", key="clean_files_tranc"):
+                    st.session_state.uploaded_files_tranc = []
+                    st.session_state.data_frames_tranc = []
+
+        if error_file:
+            st.error(f"🚩 {st.session_state.error_file_message}")
+
+        if st.session_state.uploaded_files_tranc:
+            st.write("##### **Arquivos Carregados:**")
+            st.write(f"( *{len(st.session_state.uploaded_files_tranc)} Arquivos Carregados* )")
+            for obj in st.session_state.uploaded_files_tranc:
+                st.write(f"- {obj.name}")
 
 if __name__ == "__main__":
     run()

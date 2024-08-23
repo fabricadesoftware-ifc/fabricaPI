@@ -41,6 +41,7 @@ def run():
         ])
 
         with tab1:
+            st.warning("👀 Não foram selecionados arquivos para alunos trancados")
             st.caption("### Tabela de Status da Matrícula por Ciclo")
             table_status_formatted = df_manager.get_table_status(df_master)
             height, bars_mt, pie_mt = df_manager.calculate_layout_params(table_status_formatted)
@@ -97,9 +98,10 @@ def run():
             options["series"].append(series_pie)
 
             st.table(table_status_formatted)
-            # st_echarts(options=options, height=f"{height}px")
+            st_echarts(options=options, height=f"{height}px")
 
         with tab2:
+            st.info("🔎 Estamos apenas exibindo os dados no momento. Estamos trabalhando para oferecer visualizações mais detalhadas e informativas em breve.")
             df_manager.create_report_table(df_master)
 
         with tab3:

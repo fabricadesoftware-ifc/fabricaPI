@@ -18,15 +18,19 @@ class DataframeManager:
             st.session_state.data_frames_students = []
         if "data_frames_cycles" not in st.session_state:
             st.session_state.data_frames_cycles = []
+        if "data_frames_tranc" not in st.session_state:
+            st.session_state.data_frames_tranc = []
         if not st.session_state.get('uploaded_files_students'):
             st.session_state.uploaded_files_students = []
+        if not st.session_state.get('uploaded_files_tranc'):
+            st.session_state.uploaded_files_tranc = []
         if not st.session_state.get('uploaded_files_cycles'):
             st.session_state.uploaded_files_cycles = []
         if not st.session_state.get('error_file'):
             st.session_state.error_file = False
         if not st.session_state.get('error_file_message'):
             st.session_state.error_file_message = ""
-
+        
     def get_dataframe_names(self, name):
         if name in st.session_state:
             return st.session_state[name].keys()
@@ -34,34 +38,18 @@ class DataframeManager:
     def extract_year(self, ciclo_str):
         match = re.search(r'\b\d{4}\b', ciclo_str)
         return match.group(0) if match else None
+    
+    def extract_curse(self, i):
+        return i.split(' - ')[0] if ' - ' in i else i
 
     def get_locked_students(self):
-        csv = pd.read_csv('./assets/csv/example_trancados.csv', encoding='latin-1', sep=';')
-        master = self.get_master_dataframe()
-
-        # Extrair os quatro primeiros dígitos da matrícula (assumindo que a coluna se chama 'Matricula')
+        csv = pd.concat(st.session_state.data_frames_tranc, ignore_index=True)
         csv['Ciclo_Extraido'] = csv['matricula'].astype(str).str[:4]
-        master['CICLO DE MATRÍCULA'] = master['CICLO DE MATRÍCULA'].apply(self.extract_year)
-
-        # Verifique se os valores extraídos são únicos
-        master_unique = master.drop_duplicates(subset=['CICLO DE MATRÍCULA'])
-
-        # Combinar os DataFrames com base na comparação dos anos extraídos
-        combined_df = pd.merge(csv, master_unique, left_on='Ciclo_Extraido', right_on='CICLO DE MATRÍCULA', how='inner')
-
-        # Mostrar os DataFrames
-        ciclo_counts = combined_df['Ciclo_Extraido'].value_counts()
-
-        st.write('csv', csv)
-        st.write('master', master)
-        st.write('combined_df', combined_df)
-        st.write('ciclo_counts', ciclo_counts)
-
-        return ciclo_counts
-
+        df_grouped = csv.groupby(['Ciclo_Extraido', 'Curso'])['Nome'].count()
+        
+        return df_grouped
+    
     def get_table_status(self, df):
-        ciclo_counts = self.get_locked_students()
-
         table_status = df.groupby(['CICLO DE MATRÍCULA', 'NO_STATUS_MATRICULA']).size().unstack(fill_value=0)
         table_status['TOTAL DE ALUNOS'] = table_status.sum(axis=1)
 
@@ -70,22 +58,23 @@ class DataframeManager:
         for column in missing_columns:
             table_status[column] = 0
 
+        table_status['CURSO'] = table_status.index.to_series().apply(self.extract_curse)
         table_status['ANO'] = table_status.index.to_series().apply(self.extract_year)
 
         df_presentation = table_status[status_columns]
 
-        for ciclo, count in ciclo_counts.items():
-            st.write(f"Ciclo: {ciclo}, Contagem: {count}")
-            table_status.loc[table_status['ANO'] == ciclo, 'TRANCADO'] = count
+        if len(st.session_state.uploaded_files_tranc) > 0:
+            ciclo_counts = self.get_locked_students()
+            for index, value in ciclo_counts.items():
+                year, curse = index
+                mask = (table_status['ANO'] == year) & (table_status['CURSO'] == curse)
+                table_status.loc[mask, 'TRANCADO'] = value
 
-        df_presentation['TRANCADO'] = table_status['TRANCADO']
-        df_presentation['FREQUENTANDO'] = abs(table_status['EM_CURSO'] - table_status['TRANCADO'])
+            df_presentation['TRANCADO'] = table_status['TRANCADO']
+            df_presentation['FREQUENTANDO'] = abs(table_status['EM_CURSO'] - table_status['TRANCADO'])
 
-        st.write(table_status)
-        st.write(df_presentation)
         df_presentation = df_presentation.reset_index()
         df_presentation.rename(columns={'CICLO DE MATRÍCULA': 'NOME DO CICLO'}, inplace=True)
-
         table_status_formatted = df_presentation.set_index('NOME DO CICLO')
         
         return table_status_formatted
@@ -202,14 +191,11 @@ class DataframeManager:
             'status': status,
             'municipality': municipality
         })
+
         st.write(df_with_filters)
 
         return df_with_filters
         
-
-    def create_master_table(self, df):
-        pass
-
     def create_critical_table(self, df):
         for i in df["CICLO DE MATRÍCULA"].unique():
             if self.get_table_status(df).query(f'`NOME DO CICLO` == "{i}" and EM_CURSO < 3').shape[0] > 0:
