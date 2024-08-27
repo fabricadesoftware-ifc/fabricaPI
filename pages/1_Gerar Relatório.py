@@ -41,7 +41,8 @@ def run():
         ])
 
         with tab1:
-            st.warning("👀 Não foram selecionados arquivos para alunos trancados")
+            if len(st.session_state.uploaded_files_tranc) == 0:
+                st.warning("👀 Não foram selecionados arquivos para alunos trancados")
             st.caption("### Tabela de Status da Matrícula por Ciclo")
             table_status_formatted = df_manager.get_table_status(df_master)
             height, bars_mt, pie_mt = df_manager.calculate_layout_params(table_status_formatted)

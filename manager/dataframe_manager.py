@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 import re
 from streamlit.logger import get_logger
-from manager.config import TABLE_STATUS_COLUMNS   
+from manager.config import TABLE_STATUS_COLUMNS, TABLE_TRANC 
 
 LOGGER = get_logger(__name__)
 
@@ -44,8 +44,13 @@ class DataframeManager:
 
     def get_locked_students(self):
         csv = pd.concat(st.session_state.data_frames_tranc, ignore_index=True)
-        csv['Ciclo_Extraido'] = csv['matricula'].astype(str).str[:4]
-        df_grouped = csv.groupby(['Ciclo_Extraido', 'Curso'])['Nome'].count()
+        new_column_names = TABLE_TRANC
+
+        for i, col in enumerate(csv.columns):
+            csv.rename(columns={col: new_column_names[i]}, inplace=True)
+
+        csv['CICLO_EXTRAIDO'] = csv['MATRICULA_TRANC'].astype(str).str[:4]
+        df_grouped = csv.groupby(['CICLO_EXTRAIDO', 'CURSO_TRANC'])['NOME_TRANC'].count()
         
         return df_grouped
     
