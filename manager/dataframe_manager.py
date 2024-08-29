@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
+import re
 from streamlit.logger import get_logger
+from manager.config import TABLE_STATUS_COLUMNS, TABLE_TRANC 
 
 LOGGER = get_logger(__name__)
 
@@ -16,26 +18,69 @@ class DataframeManager:
             st.session_state.data_frames_students = []
         if "data_frames_cycles" not in st.session_state:
             st.session_state.data_frames_cycles = []
+        if "data_frames_tranc" not in st.session_state:
+            st.session_state.data_frames_tranc = []
         if not st.session_state.get('uploaded_files_students'):
             st.session_state.uploaded_files_students = []
+        if not st.session_state.get('uploaded_files_tranc'):
+            st.session_state.uploaded_files_tranc = []
         if not st.session_state.get('uploaded_files_cycles'):
             st.session_state.uploaded_files_cycles = []
         if not st.session_state.get('error_file'):
             st.session_state.error_file = False
         if not st.session_state.get('error_file_message'):
             st.session_state.error_file_message = ""
-
+        
     def get_dataframe_names(self, name):
         if name in st.session_state:
             return st.session_state[name].keys()
 
+    def extract_year(self, ciclo_str):
+        match = re.search(r'\b\d{4}\b', ciclo_str)
+        return match.group(0) if match else None
+    
+    def extract_curse(self, i):
+        return i.split(' - ')[0] if ' - ' in i else i
+
+    def get_locked_students(self):
+        csv = pd.concat(st.session_state.data_frames_tranc, ignore_index=True)
+        new_column_names = TABLE_TRANC
+
+        for i, col in enumerate(csv.columns):
+            csv.rename(columns={col: new_column_names[i]}, inplace=True)
+
+        csv['CICLO_EXTRAIDO'] = csv['MATRICULA_TRANC'].astype(str).str[:4]
+        df_grouped = csv.groupby(['CICLO_EXTRAIDO', 'CURSO_TRANC'])['NOME_TRANC'].count()
+        
+        return df_grouped
+    
     def get_table_status(self, df):
         table_status = df.groupby(['CICLO DE MATRÍCULA', 'NO_STATUS_MATRICULA']).size().unstack(fill_value=0)
         table_status['TOTAL DE ALUNOS'] = table_status.sum(axis=1)
-        table_status.columns = ['ABANDONO', 'CONCLUÍDA', 'DESLIGADO', 'EM_CURSO', 'TRANSF_EXT', 'TOTAL DE ALUNOS']
-        table_status = table_status.reset_index()
-        table_status.rename(columns={'CICLO DE MATRÍCULA': 'NOME DO CICLO'}, inplace=True)
-        table_status_formatted = table_status.set_index('NOME DO CICLO')
+
+        status_columns = TABLE_STATUS_COLUMNS
+        missing_columns = set(status_columns) - set(table_status.columns)
+        for column in missing_columns:
+            table_status[column] = 0
+
+        table_status['CURSO'] = table_status.index.to_series().apply(self.extract_curse)
+        table_status['ANO'] = table_status.index.to_series().apply(self.extract_year)
+
+        df_presentation = table_status[status_columns]
+
+        if len(st.session_state.uploaded_files_tranc) > 0:
+            ciclo_counts = self.get_locked_students()
+            for index, value in ciclo_counts.items():
+                year, curse = index
+                mask = (table_status['ANO'] == year) & (table_status['CURSO'] == curse)
+                table_status.loc[mask, 'TRANCADO'] = value
+
+            df_presentation['TRANCADO'] = table_status['TRANCADO']
+            df_presentation['FREQUENTANDO'] = abs(table_status['EM_CURSO'] - table_status['TRANCADO'])
+
+        df_presentation = df_presentation.reset_index()
+        df_presentation.rename(columns={'CICLO DE MATRÍCULA': 'NOME DO CICLO'}, inplace=True)
+        table_status_formatted = df_presentation.set_index('NOME DO CICLO')
         
         return table_status_formatted
 
@@ -151,14 +196,11 @@ class DataframeManager:
             'status': status,
             'municipality': municipality
         })
+
         st.write(df_with_filters)
 
         return df_with_filters
         
-
-    def create_master_table(self, df):
-        pass
-
     def create_critical_table(self, df):
         for i in df["CICLO DE MATRÍCULA"].unique():
             if self.get_table_status(df).query(f'`NOME DO CICLO` == "{i}" and EM_CURSO < 3').shape[0] > 0:
