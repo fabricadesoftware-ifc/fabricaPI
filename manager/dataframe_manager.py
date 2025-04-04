@@ -12,8 +12,6 @@ class DataframeManager:
         self.init_session_state()
 
     def init_session_state(self):
-        if "error_file_message" not in st.session_state:
-            st.session_state.error_file_message = ''
         if "data_frames_students" not in st.session_state:
             st.session_state.data_frames_students = []
         if "data_frames_cycles" not in st.session_state:
@@ -26,10 +24,6 @@ class DataframeManager:
             st.session_state.uploaded_files_tranc = []
         if not st.session_state.get('uploaded_files_cycles'):
             st.session_state.uploaded_files_cycles = []
-        if not st.session_state.get('error_file'):
-            st.session_state.error_file = False
-        if not st.session_state.get('error_file_message'):
-            st.session_state.error_file_message = ""
         
     def get_dataframe_names(self, name):
         if name in st.session_state:
@@ -57,6 +51,9 @@ class DataframeManager:
     def get_table_status(self, df):
         table_status = df.groupby(['CICLO DE MATRÍCULA', 'NO_STATUS_MATRICULA']).size().unstack(fill_value=0)
         table_status['TOTAL DE ALUNOS'] = table_status.sum(axis=1)
+
+        if "CONCLUï¿½DA" in table_status.columns:
+            table_status.rename(columns={"CONCLUï¿½DA": "CONCLUÍDA"}, inplace=True)
 
         status_columns = TABLE_STATUS_COLUMNS
         missing_columns = set(status_columns) - set(table_status.columns)
@@ -226,22 +223,6 @@ class DataframeManager:
                 if 'CÓDIGO CICLO DE MATRÍCULA' in data_frames[i].columns:
                     data_frames[i]['CÓDIGO CICLO DE MATRÍCULA'] = data_frames[i]['CÓDIGO CICLO DE MATRÍCULA'].astype(str)
         return pd.concat(data_frames, ignore_index=True)
-
-    def verify_files(self, files, one_file=False):
-        st.session_state.error_file_message = ''
-        if not files:
-            st.session_state.error_file_message = "Você não selecionou nenhum arquivo CSV."
-            return False
-        
-        for i, x in enumerate(files):
-            if not files[i].name.split('.')[-1] == 'csv':
-                st.session_state.error_file_message = "Os arquivos selecionados não correspondem a um arquivo CSV. Por favor, selecione um arquivo CSV válido."
-                return False
-        
-        if not len(files) == 1 and one_file:
-            st.session_state.error_file_message = "Você deve selecionar apenas um arquivo CSV."
-            return False
-        return True
     
     def clean_df(self, df):
         if df.shape[0] > 1:
