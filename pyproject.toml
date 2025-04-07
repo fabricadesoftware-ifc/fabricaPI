@@ -22,3 +22,7 @@ license = {text = "MIT"}
 
 [tool.pdm]
 distribution = false
+
+[tool.pdm.scripts]
+dev = "streamlit run Apresentação.py"
+
