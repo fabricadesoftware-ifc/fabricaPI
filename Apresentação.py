@@ -37,7 +37,7 @@ def run():
 
     st.write("""
         ###### Professor: [Fábio Longo de Moura](www.github.com/ldmfabio) &nbsp;&nbsp;&nbsp;&nbsp; Aluno: [Mateus Lopes Albano](www.github.com/mateus-lopes)
-        *Versão 1.0.4*
+        *Versão 1.1.0*
     """)
 
 if __name__ == "__main__":
