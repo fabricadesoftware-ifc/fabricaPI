@@ -15,10 +15,14 @@ dependencies = [
     "scikit-learn>=1.4.2",
     "streamlit-echarts>=0.4.0",
 ]
-requires-python = "==3.10.*"
+requires-python = "==3.10.12"
 readme = "README.md"
 license = {text = "MIT"}
 
 
 [tool.pdm]
 distribution = false
+
+[tool.pdm.scripts]
+dev = "streamlit run Apresentação.py"
+

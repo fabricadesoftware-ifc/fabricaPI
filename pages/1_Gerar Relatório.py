@@ -1,11 +1,50 @@
 import streamlit as st
 from manager.dataframe_manager import DataframeManager
-from manager.chart_manager import ChartManager
 from streamlit_echarts import st_echarts
+from matplotlib import pyplot as plt
+import pandas as pd
+
+def create_graph(self, df, y, x):
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.barh(df[y], df[x])
+    ax.set_title('')
+    ax.set_xlabel('Quantidade de alunos')
+    ax.set_ylabel('')
+
+    for i,v in enumerate(df[x]):
+        ax.text(v + 1, i, str(v), color="black", fontsize=8, ha="left", va="center")
+
+    ax.yaxis.set_tick_params(labelsize=12)
+    ax.xaxis.set_tick_params(labelsize=12)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    st.pyplot(fig)
+
+def get_filtered_df(self, df, ciclo, curse):
+    if ciclo in df['CICLO DE MATRÍCULA'].unique() and curse in df[df['CICLO DE MATRÍCULA'] == ciclo]['NOME DO CURSO'].unique():
+        df_filtered = df[(df['CICLO DE MATRÍCULA'] == ciclo) & (df['NOME DO CURSO'] == curse)]
+        status_counts = df_filtered['NO_STATUS_MATRICULA'].value_counts().reset_index()
+        status_counts.columns = ['Status da Matrícula', 'Total']
+        return status_counts
+    else:
+        return pd.DataFrame({'Status da Matrícula': [], 'Total': []})
+
+def generate_chart(self, df):
+    col1, col2 = st.columns(2)
+
+    with col1:
+        cycle = st.selectbox('Ciclo de Matrícula', df['CICLO DE MATRÍCULA'].unique())
+    with col2:
+        curse_options = df[df['CICLO DE MATRÍCULA'] == cycle]['NOME DO CURSO'].unique()
+        curse = st.selectbox('Nome do Curso', curse_options)
+
+    df_filtro_NO_STATUS_MATRICULA = self.get_filtered_df(df, cycle, curse)
+    st.bar_chart(data=df_filtro_NO_STATUS_MATRICULA, y='Total', x='Status da Matrícula')
 
 def run():
     df_manager = DataframeManager()
-    chart_manager = ChartManager()
+
     st.set_page_config(
         page_title="Campus PI App | Apresentação", 
         page_icon="📉", 
@@ -41,6 +80,8 @@ def run():
         ])
 
         with tab1:
+            # if len(st.session_state.uploaded_files_tranc) == 0:
+            #     st.warning("👀 Não foram selecionados arquivos para alunos trancados")
             st.caption("### Tabela de Status da Matrícula por Ciclo")
             table_status_formatted = df_manager.get_table_status(df_master)
             height, bars_mt, pie_mt = df_manager.calculate_layout_params(table_status_formatted)
@@ -100,6 +141,7 @@ def run():
             st_echarts(options=options, height=f"{height}px")
 
         with tab2:
+            st.info("🔎 Estamos apenas exibindo os dados no momento. Estamos trabalhando para oferecer visualizações mais detalhadas e informativas em breve.")
             df_manager.create_report_table(df_master)
 
         with tab3:
